@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load thumbnail %}
+{% block title %}{{ object.first_name }} {{ object.last_name }}{% endblock title %}
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'user/user-profile.css' %}"/>
+{% endblock %}
+{% block content %}
+
+<body>
+    <div class="main-content mt-5">
+      <div class="container py-5">
+        <!-- Table -->
+        <div class="row mt-5">
+          <div class="col-xl-8 m-auto order-xl-2 mb-5 mb-xl-0">
+            <div class="card card-profile shadow">
+              <div class="row justify-content-center">
+                <div class="col-lg-3 order-lg-2">
+                  <div class="card-profile-image">
+                    {% thumbnail object.profile_pic "170x170" crop="center" as im %}
+                        <img src="{{ im.url }}" class="rounded-circle"></a>
+                    {% endthumbnail %}
+                  </div>
+                </div>
+              </div>
+              <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                <div class="d-flex justify-content-between">
+                  {% if object.is_verified %} <a href="#" class="btn btn-info mr-4">Verified</a> {% endif %}
+                  {% if object == request.user %}<a href="{% url 'user-edit' object.id %}" class="btn btn-warning float-right">Settings</a>{% endif %}
+                </div>
+              </div>
+              <div class="card-body pt-0 pt-md-3">
+                <div class="row">
+                  <div class="col">
+                    <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                      
+                      <div>
+                        <h4 class="mb-0">{{ object.first_name }} {{ object.last_name }}</h4>
+                        {% if object.bio %} 
+                        <span>{{ object.bio }}</span>
+                        {% else %}
+                        <span>({{ object.username }})</span>
+                        {% endif %}
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <h3>
+                    Reputation: {{object.reputation}}
+                  </h3>
+                  <h3>
+                    Total Donation Made: {{ total_donations }}
+                  </h3>
+                </div>
+                <div>
+                  <hr class="my-4">
+                  <h2 class="text-center my-4">
+                    Recent Donations
+                  </h2>
+                  {% if donations %}
+                  {% for donation in donations %}
+                  <div class="col-xl-12 col-md-12 mb-4">
+                    <div class="card border-0 shadow">
+                      <div class="card-body">
+                        <h5 class="card-title mb-0">Donated {{donation.no_of_item }}{{ donation.item.unit }} {{ donation.item.name }} to <a href="{% url 'bank-detail' donation.bank.id %}"> {{ donation.bank.name }}</a></h5>
+                        <p class="card-text text-success mb-0" style="float: right;" >{% if donation.donated_by %}Reputation: +{{ donation.total_reputation_earned }}{% endif %}</p>
+                        <div class="card-text text-black-50">{{ donation.created_at|naturaltime }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                  {% else %}
+                  <p class="text-center">No Recent Donations</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+{% endblock %}

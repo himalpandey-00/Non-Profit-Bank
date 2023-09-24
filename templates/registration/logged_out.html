@@ -1,0 +1,18 @@
+ {% extends 'base.html' %}
+{% load i18n %}
+{% block title %}Logged Out | meroDera{% endblock %}
+{% block page_meta %}
+    <meta name="description" content="You have been logged out of meroDera. Login to Buy, Rent, or Sell Rooms, Houses, Flats/ Apartments, Hostels, and connect instantly with buyers all over Nepal."/>
+{% endblock %}
+{% block content %}
+<div class = "container" style="margin-top: 100px;">
+    <h3>{% trans 'You have been logged out successfully...' %}</h3>
+    <hr>
+    <div class="py-3" style="margin-bottom: 50px;">
+        <a class="btn btn-success btn-lg" href="{% url 'login' %}">{% trans 'Go Home' %}</a>
+    </div>
+</div>
+{% endblock %}
+{% block footer %}
+    {{ block.super }}
+{% endblock %}

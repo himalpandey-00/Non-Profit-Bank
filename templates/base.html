@@ -1,0 +1,181 @@
+{% load static %}
+{% load i18n %}
+{% load thumbnail %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+    <meta content='maximum-scale=1.0, initial-scale=1.0, width=device-width' name='viewport'>
+    <title>{% block title %}{% endblock %}</title>
+    {% block page_meta %}
+    {% endblock %}
+    {#Global styles #}
+    {% block site_css %}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+        <style>    
+            :root {
+                --font-family-sans-serif: Open Sans, sans-serif;
+                --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+            }
+        </style>
+        {% endblock %}
+    {# Page-specific styles #}
+    {% autoescape off %}
+        {% block page_css %}{% endblock %}
+    {% endautoescape %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Start Bootstrap</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'list-donation' %}">Donations</a>
+                        <span class="sr-only">(current)</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'leaderboard-index' %}">Leaderboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://dhakal0kushal.medium.com/product-description-noname-bf0f1f8ba887" target="_blank">About</a>
+                    </li>
+                    <form class="form-inline my-2 my-lg-0" action="#" method="get">
+                        <div class="input-group">
+                            <input class="form-control" type="text" name = "q" placeholder="Search Banks.." aria-label="Search">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink" style="font-size: 1.1em !important;" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {% thumbnail request.user.profile_pic "25x25" crop="center" as im %}
+                            <img alt="@{{ user.username }}"" src="{{ im.url }}" class="rounded-circle"></a>
+                            {% endthumbnail %}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{% url "user-profile" request.user.username %}">{% trans 'Your Profile' %}</a>
+                            {% if request.user.is_staff %}
+                                <a class="dropdown-item" href="#">Your Banks</a>
+                            {% endif %}
+                            <a class="dropdown-item" href="{% url "logout" %}">{% trans 'Logout' %}</a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url "login" %}" style="font-size: 1.1em !important;"> Log in<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="btn btn-outline-secondary rounded-pill shadow-sm" href="{% url 'user-register' %}" style="font-size: 1.1em !important;"><i class="fas fa-user-plus"></i>Sign up <span class="sr-only">(current)</span></a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block content %}
+    {% endblock %}
+    
+{% block footer %}
+<footer class="py-5" style="background: #131f41;"> 
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto">
+                <a class="navbar-brand" href="#">
+                    <img src="logo.png" alt="logo here">
+                </a>
+                <p class="py-3 text-white">{% trans "Now Food/Cloth Banks Near You!!" %}</p>
+            </div>
+
+            <hr class="w-100 clearfix d-md-none">
+
+            <!-- Grid column -->
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-white">{% trans 'Company' %}</h6>
+                <p>
+                    <a class="text-white" href="#">{% trans 'About' %}</a>
+                </p>
+                <p>
+                    <a class="text-white" href="#">{% trans 'Careers' %}</a>
+                </p>
+                <p>
+                    <a class="text-white" href="#">{% trans 'Blog' %}</a>
+                </p>
+            </div>
+            <!-- Grid column -->
+            <hr class="w-100 clearfix d-md-none">
+
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-white">{% trans 'Useful links' %}</h6>
+                <p>
+                    <a class="text-white" href="#">{% trans 'Contact Us' %}</a>
+                </p>
+                <p>
+                    <a class="text-white" href="#">{% trans 'FAQs' %}</a>
+                </p>
+                <p>
+                    <a class="text-white" href="#">{% trans 'Help' %}</a>
+                </p>
+            </div>
+            <!-- Grid column -->
+            <hr class="w-100 clearfix d-md-none">
+            <!-- Grid column -->
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-white">{% trans 'Contact' %}</h6>
+                <p class ='text-white'><i class="fas fa-home mr-3"></i>{% trans 'Tokha, Kathmandu' %}</p>
+                <p class="text-white"><i class="fas fa-envelope mr-3"></i><a class="text-white" href="mailto:himalfrom2061@gmail.com">himalfrom2061@gmail.com</a> </p>
+                <p class="text-white"><i class="fas fa-phone mr-3"></i><a class="text-white" href="tel:+977-9863299610">+ 977 9848992700</a></p>
+                <p class="text-white"><i class="fas fa-print mr-3"></i><a class="text-white" href="tel:+977-9847592078">+ 977 9814679671</a></p>
+                <!-- Social buttons -->
+                <ul class="list-unstyled list-inline">
+                    <li class="list-inline-item">
+                        <a class="text-white" href="https://www.facebook.com/h1malpandey"><i class="fab fa-facebook"></i></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="text-white" href="https://twitter.com/h1mal_pandey"><i class="fab fa-twitter"></i></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="text-white" href="https://www.instagram.com/h1mal_pandey"><i class="fab fa-instagram"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Grid column -->
+        </div>
+        <!-- Footer links -->
+        <hr class="w-100 clearfix d-md-none">
+        <div class="row text-center">
+            <div class="col-md-6 col-lg-6 col-xl-6 mx-auto">
+                <a class="text-white mr-4" href="#">{% trans 'Privacy' %}</a>
+                <a class="text-white mr-4" href="#">{% trans 'Terms and Conditions' %}</a>
+                <a class="text-white" href="#">{% trans 'Report a Security Issue' %}</a>
+
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-6 mx-auto">
+                <p class="text-center text-md-left text-white">© 2023 Himal. All rights reserved.</p>
+            </div>
+        </div>
+        <!-- Grid row -->
+    </div>
+</footer>
+{% endblock %}
+    {% block javascript %}
+    <!-- JS, Popper.js, and jQuery -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    {% endblock %}
+</body>
+</html>

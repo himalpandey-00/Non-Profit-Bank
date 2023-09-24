@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Add your Property | meroDera{% endblock %}
+{% block page_meta %}
+<meta name="description" content="Use this form to add your property to show to people all over Nepal. Let people all over Nepal find your property."/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="row py-5 mt-5">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% for users in object_list %}
+    <!-- Team Member 1 -->
+    <div class="col-xl-12 col-md-12 mb-4 text-center">
+      <div class="card border-0 shadow">
+        <div class="card-body">
+            <h4 class="card-title"><a href="{% url 'user-profile' users.username %}">{{ users.first_name }} {{ users.last_name }}</a></h4>
+            <h5 class="card-text text-success">Total Reputation: {{ users.reputation }}</h5>
+        </div>
+      </div>
+    </div>
+    <!-- end -->
+    {% endfor %}
+    <ul>
+        {% if page_obj.has_other_pages %}
+            {% if page_obj.has_previous %}
+                <a class ="btn btn-outline-info mb-4" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">First</a>
+                <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Previous</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class ="btn btn-info mb-4" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3'%}
+                    <a class ="btn btn-outline-info mb-4" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Next</a>
+                <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Last</a>
+            {% endif %}
+        {% endif %}
+    </ul>
+  </div>
+  <!-- /.row -->
+</div>
+  
+{% endblock %}

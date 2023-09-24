@@ -1,0 +1,77 @@
+{% load crispy_forms_tags %}
+{% load static %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel='stylesheet' type="text/css" href="{% static 'user/register.css' %}">
+<title>Register</title>
+<meta content='maximum-scale=1.0, initial-scale=1.0, width=device-width' name='viewport'>
+<nav class="navbar navbar-light bg-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Start Bootstrap</a>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid py-5">
+    <div class="row no-gutter">
+        <div class="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
+        <div class="col-md-8 col-lg-6">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-9 col-lg-8 mx-auto">
+                            <h3 class="login-heading mb-4">Sign Up</h3>
+                            <p>Register with a linked account</p>
+                            <div class="row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <a class="btn btn-danger btn-block" href="#" >
+                                        <i class="fab fa-google mr-2"></i> Google</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <a class="btn btn-primary active btn-block" href="#" role="button" >
+                                        <i class="fab fa-facebook-f mr-2"></i> Facebook</a>
+                                </div>
+                            </div>
+                            <div class="or-seperator"><i>or</i></div>
+                            <form method = "post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        {{ form.first_name | as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{ form.last_name | as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.email | as_crispy_field }}
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        {{ form.password1 | as_crispy_field }}
+                                        </div>
+                                    <div class="col-sm-6">
+                                        {{ form.password2 | as_crispy_field }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.captcha }}
+                                    </div>
+                                </div>
+                                <hr>
+                                <p>By clicking 'Create account', you agree to our <a href="#">Terms and Conditions</a> and acknowledge that
+                                        you have read our <a href="#">Privacy Policy</a>.</p>
+
+                                <button class="btn btn-primary btn-user btn-block" type="submit">Create Account</button>
+                            </form>
+                            <hr>
+                            <div class="text-center">
+                                <a href="{% url 'login' %}">Already have an account? Login!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

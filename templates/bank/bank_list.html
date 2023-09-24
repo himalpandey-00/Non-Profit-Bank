@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% block page_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>    
+{% endblock %}
+{% block content %}
+<header class="text-center py-3" style="margin-top: 60px;"> 
+  {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+    <div class="container">
+      <h1>All Banks</h1>
+    </div>
+  </header>
+  <section>
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <!-- Team Member 1 -->
+      {% for bank in object_list %}
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-0 shadow">
+          <div id="bank{{ bank.id }}" style="width: 100%; height: 350px;"></div>
+          <div class="card-body text-center">
+            <h5 class="card-title mb-0">{{ bank.name }}</h5>
+            <div class="card-text text-black-50 mb-1">{{ bank.location }}</div>
+            <a class='btn btn-primary' href="{% url 'bank-detail' bank.id %}">View Details</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <!-- /.row -->
+    <ul>
+      {% if page_obj.has_other_pages %}
+          {% if page_obj.has_previous %}
+              <a class ="btn btn-outline-info mb-4" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">First</a>
+              <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Previous</a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                  <a class ="btn btn-info mb-4" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">{{ num }}</a>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3'%}
+                  <a class ="btn btn-outline-info mb-4" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">{{ num }}</a>
+              {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+              <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Next</a>
+              <a class ="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% else %}&q={% endif %}{% if request.GET.kind %}&kind={{ request.GET.kind }}{% else %}&kind={% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% else %}&type={% endif %}">Last</a>
+          {% endif %}
+      {% endif %}
+  </ul>
+  </div>
+  <!-- /.container -->
+  </section>
+  {% endblock %}
+  
+  {% block javascript %}
+  {{ block.super }}
+  <script>
+    {% for featured_bank in object_list %}
+      var bankstr = L.map('bank{{ featured_bank.id }}').setView([{{ featured_bank.latitude }}, {{ featured_bank.longitude }}], 13);
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGhha2FsMGt1c2hhbCIsImEiOiJja2s0NXR5NXEwZGlkMm9xbjdwaXNsZGR1In0.AhtNXGWQBtKK7mVfV99qTQ', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+    }).addTo(bankstr);
+      var LeafIcon = L.Icon.extend({
+		options: {
+			shadowUrl: '{% static 'bank/burger.svg' %}',
+			iconSize:     [30, 25],
+			shadowSize:   [0, 0],
+			iconAnchor:   [20, 20],
+			shadowAnchor: [0, 0],
+			popupAnchor:  [-5, -15]
+		}
+    });
+    
+	var burgerIcon = new LeafIcon({iconUrl: '{% static 'bank/burger.svg' %}'}),
+        clothIcon = new LeafIcon({iconUrl: '{% static 'bank/cloth.svg' %}'});
+    L.marker([{{ featured_bank.latitude }}, {{ featured_bank.longitude }}], {icon:{% if featured_bank.bank_type.name == 'Food' %}burgerIcon{% else %}clothIcon{% endif %}}).addTo(bankstr)
+        .bindPopup("<b>This is Kathmandu!</b><br />I am a popup.<br /><a href='{% url 'bank-detail' featured_bank.id %}'>View Bank</a>");
+        
+    {% endfor %}
+    
+	var popup = L.popup();
+  </script>
+  
+  {% endblock %}

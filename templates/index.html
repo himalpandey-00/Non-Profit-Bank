@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Find Food/ Cloth Banks in Nepal{% endblock title %}
+{% block page_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>    
+{% endblock %}
+{% block content %}
+<!-- Page Content -->
+<section class="py-5 mt-5" style="background: #f7fafc">
+  {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+    <div class="mx-auto" style="width: 85%;">
+      <h1 class="text-center">Find Food/ Cloth Banks Near You!!</h1>
+      <p class="lead text-center">You can use this application to find any type of food, cloth banks around Nepal. Build a profile while donating to the needy ones.</p>
+        <div id="mainmap" style="width: 100%; height: 400px;"></div>
+    </div>
+  </section>
+  <!-- Donations Tab -->
+  <header class="text-center py-4" style="background: #131f41;">
+    <div class="container">
+      <h1 class=" text-white">Recent Donations</h1>
+    </div>
+  </header>
+  <section style="background: #131f41;">
+    <div class="container">
+      <div class="row">
+          {% for donation in object_list.donations %}
+          <div class="col-xl-12 col-md-12 mb-4">
+            <div class="card border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title mb-0">{% if donation.donated_by %}<a href="{% url 'user-profile' donation.donated_by.username %}">{{ donation.donated_by.first_name }} {{ donation.donated_by.last_name }}</a>{% else %}{{ donation.display_name }} {% endif %} donated {{donation.no_of_item }}{{ donation.item.unit }} {{ donation.item.name }}</h5>
+                <p class="card-text text-success mb-0" style="float: right;" >{% if donation.donated_by %}Reputation: + {{ donation.total_reputation_earned }}{% endif %}</p>
+                <div class="card-text text-black-50">{{ donation.created_at|naturaltime }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+  </section>
+  <!-- Featured Banks Tab -->
+  <header class="text-center py-5" style="background: #f7fafc;">
+    <div class="container">
+      <h1 class=" text-black">Featured Banks</h1>
+    </div>
+  </header>
+  
+  <section style="background: #f7fafc;">
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <!-- Team Member 1 -->
+      {% for featured_bank in object_list.featured_bank %}
+      <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-0 shadow">
+          <div id="bank{{ featured_bank.id }}" style="width: 100%; height: 350px;"></div>
+          <div class="card-body text-center">
+            <h5 class="card-title mb-0">{{ featured_bank.bank.name }}</h5>
+            <div class="card-text text-black-50">{{ featured_bank.bank.location }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center">
+        <a href="{% url 'bank-index' %} " class="btn btn-secondary btn-lg mb-5">Show All Banks</a>
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /.container -->
+  </section>
+  {% endblock %}
+  {% block javascript %}
+  {{ block.super }}
+  
+<script>
+	var mainmap = L.map('mainmap').setView([28.3949, 84.1240], 7);
+    
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGhha2FsMGt1c2hhbCIsImEiOiJja2s0NXR5NXEwZGlkMm9xbjdwaXNsZGR1In0.AhtNXGWQBtKK7mVfV99qTQ', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+    }).addTo(mainmap);
+  
+  function onLocationFound(e) {
+    mainmap.setView(e.latlng, 8);
+  } 
+  mainmap.on('locationfound', onLocationFound);
+   
+  mainmap.locate();
+        
+  var LeafIcon = L.Icon.extend({
+		options: {
+			shadowUrl: '{% static 'bank/burger.svg' %}',
+			iconSize:     [30, 25],
+			shadowSize:   [0, 0],
+			iconAnchor:   [20, 20],
+			shadowAnchor: [0, 0],
+			popupAnchor:  [-5, -15]
+		}
+    });
+    
+	var burgerIcon = new LeafIcon({iconUrl: '{% static 'bank/burger.svg' %}'}),
+        clothIcon = new LeafIcon({iconUrl: '{% static 'bank/cloth.svg' %}'});
+        
+  {% for map_content in object_list.bank %}
+  L.marker([{{ map_content.latitude }}, {{ map_content.longitude }}], {icon:{% if map_content.bank_type.name == 'Food' %}burgerIcon{% else %}clothIcon{% endif %}}).bindPopup("<b>{{ map_content.name }}</b><br/>{{ map_content.location}} <br /><a href='{% url 'bank-detail' map_content.id %}'>View Bank</a>").addTo(mainmap);
+  {% endfor %}
+
+  {% for featured_bank in object_list.featured_bank %}
+
+  var bankstr = L.map('bank{{ featured_bank.id }}').setView([{{ featured_bank.bank.latitude }}, {{ featured_bank.bank.longitude }}], 13);
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGhha2FsMGt1c2hhbCIsImEiOiJja2s0NXR5NXEwZGlkMm9xbjdwaXNsZGR1In0.AhtNXGWQBtKK7mVfV99qTQ', {
+  maxZoom: 18,
+  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+  id: 'mapbox/streets-v11',
+  tileSize: 512,
+  zoomOffset: -1
+  }).addTo(bankstr);
+    
+	L.marker([{{ featured_bank.bank.latitude }}, {{ featured_bank.bank.longitude }}], {icon:{% if featured_bank.bank.bank_type.name == 'Food' %}burgerIcon{% else %}clothIcon{% endif %}}).addTo(bankstr)
+        .bindPopup("<b>This is Kathmandu!</b><br />I am a popup.<br /><a href='{% url 'bank-detail' featured_bank.bank.id %}'>View Bank</a>");
+        
+  {% endfor %}
+    
+	var popup = L.popup();
+</script>
+  {% endblock %}

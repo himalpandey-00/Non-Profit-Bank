@@ -1,0 +1,73 @@
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+<meta content='maximum-scale=1.0, initial-scale=1.0, width=device-width' name='viewport'>
+<title>Login</title>
+<meta name="description" content="Login to meroDera. Add a property to the best property website of Nepal, manage all your properties, photos, description, and make it visible all over Nepal."/>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+<link rel='stylesheet' type="text/css" href="{% static 'user/login.css' %}">
+<nav class="navbar navbar-light bg-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Start Bootstrap</a>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row no-gutter">
+        <div class="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
+        <div class="col-md-8 col-lg-6">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-9 col-lg-8 mx-auto">
+                            <h3 class="login-heading mb-4">{% trans 'Welcome!!' %}</h3>
+                            <p>{% trans 'Log in with your linked account' %}</p>
+                            <div class="row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <a class="btn btn-danger btn-block" href="#" >
+                                        <i class="fab fa-google mr-2"></i> {% trans 'Google' %}</a>
+                                </div>
+                                <div class="col-sm-6">
+                                    <a class="btn btn-primary active btn-block" href="#" role="button" >
+                                        <i class="fab fa-facebook-f mr-2"></i> {% trans 'Facebook' %}</a>
+                                </div>
+                            </div>
+                            <div class="or-seperator"><i>{% trans 'or' %}</i></div>
+
+                            <form method = "post">
+                                {% csrf_token %}
+                                {% if form.errors %}
+                                    <div class="alert alert-danger">
+                                        {% trans 'Please enter a correct username and password. Note that both fields may be case-sensitive.' %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="form-group">
+                                    {{ form.username | as_crispy_field }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form.password | as_crispy_field }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form.captcha }}
+                                </div>
+                                <button class="btn btn-primary btn-user btn-block" type="submit">{% trans 'Login' %}</button>
+                                <hr/>
+                                <div class="text-center">
+                                    <a href="{% url 'password_reset' %}">{% trans 'Forgot Password?' %}</a>
+                                </div>
+                                <div class="text-center">
+                                    <a href="{% url 'user-register' %}">{% trans 'Create an User Account!' %}</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
